@@ -1,0 +1,30 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Personal Knowledge-Base Assistant — backend",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "init-index": "node scripts/init-index.js",
+    "test": "node --test tests/*.test.js",
+    "zip": "node ../zip-server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@pinecone-database/pinecone": "^8.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "pdf-parse": "^2.4.5"
+  },
+  "devDependencies": {
+    "archiver": "^8.0.0",
+    "nodemon": "^3.1.14"
+  }
+}
