@@ -92,41 +92,23 @@
   position: relative;
 }
 
-/* ── Mobile sidebar overlay ──────────────────────────────────── */
-.sidebar-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  z-index: 40;
-  backdrop-filter: blur(2px);
-}
-
-.sidebar--mobile {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: min(300px, 85vw);
-  height: 100svh;
-  z-index: 50;
-  overflow-y: auto;
-  padding: 0 16px 24px;
+/* ================================================================
+   Sidebar — single instance, always mounted
+   Desktop: normal grid column
+   Mobile:  fixed overlay, slides in/out via data-open attribute
+   ================================================================ */
+.sidebar {
+  border-right: 1px solid var(--border);
+  padding: 18px 16px;
+  display: flex;
   flex-direction: column;
   gap: 18px;
   background: var(--bg-subtle);
-  border-right: 1px solid var(--border);
-  box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+  overflow-y: auto;
 }
 
-.sidebar-mobile-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 0 12px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 16px;
-  flex-shrink: 0;
-}
+/* Mobile drawer header — hidden on desktop */
+.sidebar-mobile-header { display: none; }
 
 .sidebar-mobile-title {
   font-size: 13px; font-weight: 700; text-transform: uppercase;
@@ -141,24 +123,6 @@
   transition: background 0.15s;
 }
 .sidebar-mobile-close:hover { background: var(--border); }
-
-/* ================================================================
-   Sidebar
-   ================================================================ */
-.sidebar {
-  border-right: 1px solid var(--border);
-  padding: 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  background: var(--bg-subtle);
-  overflow-y: auto;
-}
-
-/* Desktop sidebar — always visible */
-.sidebar--desktop {
-  display: flex;
-}
 
 /* ================================================================
    Upload panel
@@ -823,43 +787,60 @@
   /* Header */
   .app-header { padding: 10px 14px; }
   .app-header h1 { font-size: 15px; }
-  .app-subtitle { display: none; }  /* hide on very small screens */
-  .sidebar-toggle { display: flex; } /* show hamburger */
+  .app-subtitle { display: none; }
+  .sidebar-toggle { display: flex; }
 
-  /* Layout — single column, chat takes full width */
+  /* Layout — chat takes full width */
   .app-layout {
     grid-template-columns: 1fr;
     height: calc(100svh - 57px);
   }
 
-  /* Desktop sidebar hidden on mobile */
-  .sidebar--desktop { display: none; }
+  /* Sidebar becomes a fixed overlay on mobile */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: min(300px, 85vw);
+    height: 100svh;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+    padding-top: 0;
+    border-right: 1px solid var(--border);
+  }
 
-  /* Mobile sidebar drawer + backdrop shown */
-  .sidebar-backdrop { display: block; }
-  .sidebar--mobile  { display: flex; }
+  /* When open — slide in */
+  .sidebar[data-open="true"] {
+    transform: translateX(0);
+  }
+
+  /* Show mobile drawer header */
+  .sidebar-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    flex-shrink: 0;
+  }
 
   /* Chat panel full width */
   .chat-panel { width: 100%; }
 
-  /* Message list — less padding */
+  /* Message list */
   .msg-list { padding: 16px 12px; gap: 16px; }
-
-  /* Messages — full width, smaller avatars */
   .msg { gap: 8px; }
   .msg__avatar { width: 28px; height: 28px; font-size: 14px; }
   .msg__body { max-width: 100%; }
   .msg--user .msg__body { max-width: 88%; }
-
-  /* Bubbles */
   .msg--user .msg__text { font-size: 13.5px; padding: 10px 14px; }
   .msg__markdown { font-size: 13.5px; padding: 12px 14px; }
-
-  /* Hide copy button label on mobile — just the icon */
   .copy-btn__label { display: none; }
   .copy-btn { padding: 3px 6px; }
 
-  /* Source cards — tighter */
+  /* Source cards */
   .src-card__header { padding: 8px 12px 0; }
   .src-card__relevance { padding: 6px 12px; }
   .src-card__snippet { padding: 8px 12px 10px; font-size: 12px; }
@@ -876,7 +857,7 @@
   .chat-empty__hint { font-size: 13px; }
   .chat-empty__chip { font-size: 12px; padding: 5px 12px; }
 
-  /* Upload panel drop zone */
+  /* Upload panel */
   .drop-zone { padding: 20px 12px; min-height: 80px; }
   .drop-icon { font-size: 24px; }
 }
