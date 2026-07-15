@@ -86,12 +86,12 @@
 .app-layout {
   display: grid;
   grid-template-columns: 300px 1fr;
-  grid-template-rows: 1fr;  /* single row that fills all remaining height */
+  grid-template-rows: 1fr;
   flex: 1;
   min-height: 0;
   height: calc(100svh - 57px);
   position: relative;
-  overflow: hidden;
+  /* NO overflow:hidden here — it clips fixed-position children on mobile */
 }
 
 /* ================================================================
@@ -107,6 +107,17 @@
   gap: 18px;
   background: var(--bg-subtle);
   overflow-y: auto;
+}
+
+/* Backdrop — fixed overlay behind the mobile sidebar */
+.sidebar-backdrop {
+  display: none; /* shown only on mobile via media query */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 40;   /* behind sidebar (z-index: 50) so sidebar buttons stay clickable */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 /* Mobile drawer header — hidden on desktop */
@@ -817,6 +828,9 @@
   .chat-panel {
     height: calc(100dvh - 57px);
   }
+
+  /* Show backdrop on mobile */
+  .sidebar-backdrop { display: block; }
 
   /* Sidebar becomes a fixed overlay on mobile */
   .sidebar {

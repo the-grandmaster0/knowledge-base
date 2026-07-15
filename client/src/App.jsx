@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import UploadPanel from './components/UploadPanel.jsx';
 import ChatPanel from './components/ChatPanel.jsx';
@@ -112,49 +112,22 @@ export default function App() {
       <main className="app-layout">
 
         {/* ── Single sidebar — always mounted, never duplicated ── */}
-        {/*    Desktop: static column via CSS grid                  */}
-        {/*    Mobile: slides in/out via Framer Motion transform    */}
-        <>
-          {/* Backdrop — only visible on mobile when open */}
-          <AnimatePresence>
-            {sidebarOpen && (
-              <motion.div
-                className="sidebar-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                onClick={() => setSidebarOpen(false)}
-                aria-hidden="true"
-              />
-            )}
-          </AnimatePresence>
-
-          {/*
-            The sidebar is ALWAYS in the DOM.
-            On desktop: normal grid column, transform has no effect (translateX(0)).
-            On mobile:  position:fixed, slides via x transform.
-            This means UploadPanel is never remounted — its state is preserved.
-          */}
-          <motion.aside
-            className="sidebar"
-            aria-label="Documents sidebar"
-            // Only animate on mobile — on desktop this is a no-op since
-            // the element is in normal flow and transform doesn't shift it.
-            animate={{ x: 0 }}
-            aria-hidden={sidebarOpen ? undefined : undefined}
-            data-open={sidebarOpen}
-          >
-            {/* Mobile drawer header */}
-            <div className="sidebar-mobile-header">
-              <span className="sidebar-mobile-title">Documents</span>
-              <button
-                className="sidebar-mobile-close"
-                onClick={() => setSidebarOpen(false)}
-                aria-label="Close sidebar"
-                type="button"
-              >✕</button>
-            </div>
+        <motion.aside
+          className="sidebar"
+          aria-label="Documents sidebar"
+          animate={{ x: 0 }}
+          data-open={sidebarOpen}
+        >
+          {/* Mobile drawer header */}
+          <div className="sidebar-mobile-header">
+            <span className="sidebar-mobile-title">Documents</span>
+            <button
+              className="sidebar-mobile-close"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close sidebar"
+              type="button"
+            >✕</button>
+          </div>
 
             <UploadPanel onIngested={handleIngested} />
 
@@ -228,7 +201,21 @@ export default function App() {
               )}
             </AnimatePresence>
           </motion.aside>
-        </>
+
+        {/* Backdrop — outside sidebar, covers chat when drawer is open */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              className="sidebar-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setSidebarOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+        </AnimatePresence>
 
         {/* ── Chat area ────────────────────────────────────────── */}
         <ChatPanel />
