@@ -112,10 +112,9 @@ export default function App() {
       <main className="app-layout">
 
         {/* ── Single sidebar — always mounted, never duplicated ── */}
-        <motion.aside
+        <aside
           className="sidebar"
           aria-label="Documents sidebar"
-          animate={{ x: 0 }}
           data-open={sidebarOpen}
         >
           {/* Mobile drawer header */}
@@ -200,7 +199,7 @@ export default function App() {
                 </motion.section>
               )}
             </AnimatePresence>
-          </motion.aside>
+          </aside>
 
         {/* Backdrop — outside sidebar, covers chat when drawer is open */}
         <AnimatePresence>
