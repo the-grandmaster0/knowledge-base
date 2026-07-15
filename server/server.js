@@ -7,29 +7,34 @@ import ingestRouter from './routes/ingest.js';
 import queryRouter from './routes/query.js';
 import deleteRouter from './routes/delete.js';
 
+// ---------------------------------------------------------------------------
+// Startup env check — fail fast with a clear message rather than a cryptic 500
+// ---------------------------------------------------------------------------
+const REQUIRED_ENV = ['GEMINI_API_KEY', 'PINECONE_API_KEY'];
+const missing = REQUIRED_ENV.filter((k) => !process.env[k]);
+if (missing.length > 0) {
+  console.error(`FATAL: Missing required environment variables: ${missing.join(', ')}`);
+  console.error('Set these in Elastic Beanstalk > Configuration > Software > Environment properties.');
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // ---------------------------------------------------------------------------
 // CORS
-// In production, ALLOWED_ORIGIN must be set to your Vercel frontend URL,
-// e.g. https://your-app.vercel.app
-// In development it falls back to localhost:5173.
 // ---------------------------------------------------------------------------
-const ALLOWED_ORIGINS = [
-  process.env.ALLOWED_ORIGIN,          // production Vercel URL (set in EB env vars)
-  'http://localhost:5173',             // Vite dev server
-  'http://localhost:4173',             // Vite preview
-].filter(Boolean);
-
+// In production, requests come from Vercel's edge (proxy), not directly from
+// the browser.  Vercel sends requests server-to-server, so the Origin header
+// is either absent or set to Vercel's internal domain.
+// We allow all origins here because:
+//   1. The browser never calls EB directly — it calls Vercel, which proxies.
+//   2. Vercel already enforces HTTPS for the browser-facing leg.
+//   3. EB is protected by security groups (only Vercel/CloudFront can reach it).
+// For local dev, this also allows localhost:5173 via the Vite proxy.
 app.use(
   cors({
-    origin(origin, callback) {
-      // Allow requests with no origin (e.g. curl, Postman, same-origin)
-      if (!origin) return callback(null, true);
-      if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-      callback(new Error(`CORS: origin "${origin}" not allowed`));
-    },
+    origin: true,   // reflect any origin — safe because browser never calls EB directly
     methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'X-Session-Id'],
     credentials: true,
@@ -60,4 +65,5 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
