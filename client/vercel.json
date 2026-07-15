@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://your-env.elasticbeanstalk.com/api/:path*"
+      "destination": "http://knowledge-base-env-1.eba-ebytckmp.ap-south-1.elasticbeanstalk.com/api/:path*"
     },
     {
       "source": "/(.*)",
